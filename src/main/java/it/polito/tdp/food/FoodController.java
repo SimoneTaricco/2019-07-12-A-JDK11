@@ -5,8 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,27 +43,83 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	
+    	try {
+    		String porzioni = this.txtPorzioni.getText();
+    		int porz = Integer.parseInt(porzioni);
+    		
+    		this.model.creaGrafo(porz);
+    		this.boxFood.getItems().addAll(model.vertici());
+    		
+    		this.txtResult.setText("Grafo creato!\nNumero vertici: " + model.vertici().size() +"\nNumero archi: " + model.numeroArchi());
+    		
+    		} catch (NumberFormatException e) {
+    			txtResult.appendText("Errore: il valore inserito non è un intero.");
+    			return;
+    	} catch (NullPointerException e) {
+    		txtResult.appendText("Errore: numero porzioni non inserito.");
+			return;
+    	}
+    	
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...");
+
+    	try {
+    		Food cibo = this.boxFood.getValue();
+    		
+    		Map<Double,Food> res = model.migliori(cibo);
+    		
+    		int i=0;
+    		
+    		this.txtResult.appendText("(massimo) 5 cibi con calorie congiunte massime a partire da " + cibo + "\n");
+    		
+    		for (Double d:res.keySet()) {
+    			if (i<5) {
+    				this.txtResult.appendText(res.get(d) + " peso: " + d + "\n");
+    				i++;
+    			}
+    		}
+    		
+    		} catch (NullPointerException e) {
+    		txtResult.appendText("Errore: numero porzioni non inserito.");
+			return;
+    	} catch (NumberFormatException e) {
+			txtResult.appendText("Errore: il valore inserito non è un intero.");
+			return;
+	}
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Simulazione...");
+    	txtResult.clear(); 
+    	
+    	try {
+    	
+    	Food cibo = this.boxFood.getValue();
+    	int numeroStazioni = Integer.parseInt(this.txtK.getText());
+    	
+    	model.simula(numeroStazioni, cibo);
+    	   	   	
+    	txtResult.appendText("Tempo necessario: " + model.getTempo() + " minuti\nCibi preparati: " + model.cibiPreparati());
+    	} catch (NullPointerException e) {
+    		txtResult.appendText("Errore: numero porzioni non inserito.");
+			return;
+    	} catch (NumberFormatException e) {
+			txtResult.appendText("Errore: il valore inserito non è un intero.");
+			return;
+	} 
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
