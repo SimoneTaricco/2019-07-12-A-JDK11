@@ -28,16 +28,18 @@ public class Simulator {
 		this.grafo = grafo;
 		this.numeroStazioni = numeroStazioni;
 		this.partenza = partenza;
-		this.giaTrattati = new HashMap<Integer,Food>();
 	}
 	
 	public void init() {
+		
 		this.tempoNecessario = 0;
 		this.queue = new PriorityQueue<Event>();
+		this.giaTrattati = new HashMap<Integer,Food>();
 		
 		for (int i=0; i<numeroStazioni; i++) {
 			Food prossimo = this.prossimo(partenza, this.giaTrattati);
-			this.queue.add(new Event(tempo(partenza,prossimo),prossimo,i+1));
+			if (prossimo != null)
+				this.queue.add(new Event(tempo(partenza,prossimo),prossimo,i+1));
 		}
 		this.run();
 	}

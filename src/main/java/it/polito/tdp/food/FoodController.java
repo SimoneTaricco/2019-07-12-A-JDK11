@@ -110,6 +110,11 @@ public class FoodController {
     	Food cibo = this.boxFood.getValue();
     	int numeroStazioni = Integer.parseInt(this.txtK.getText());
     	
+    	if (numeroStazioni<1 || numeroStazioni>10) {
+    		txtResult.setText("Errore: le stazioni devono essere al massimo 10.");
+			return;
+    	}
+    	
     	model.simula(numeroStazioni, cibo);
     	   	   	
     	txtResult.appendText("Tempo necessario: " + model.getTempo() + " minuti\nCibi preparati: " + model.cibiPreparati());
