@@ -2,6 +2,7 @@ package it.polito.tdp.food.model;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
@@ -20,12 +21,15 @@ public class Simulator {
 	private PriorityQueue<Event> queue;
 	private Map<Integer,Food> giaTrattati;
 	
+	private List<Food> listaPartenza;
 	
-	public Simulator(Graph<Food, DefaultWeightedEdge> grafo, int numeroStazioni, Food partenza, Map<Double,Food> viciniPartenza) {
+	
+	public Simulator(Graph<Food, DefaultWeightedEdge> grafo, int numeroStazioni, Food partenza, List<Food> listaPartenza) {
 		super();
 		this.grafo = grafo;
 		this.numeroStazioni = numeroStazioni;
 		this.partenza = partenza;
+		this.listaPartenza = listaPartenza;
 	}
 	
 	public void init() {
@@ -35,7 +39,7 @@ public class Simulator {
 		this.giaTrattati = new HashMap<Integer,Food>();
 		
 		for (int i=0; i<numeroStazioni; i++) {
-			Food prossimo = this.prossimo(partenza, this.giaTrattati);
+			Food prossimo = this.listaPartenza.get(i);
 			if (prossimo != null)
 				this.queue.add(new Event(tempo(partenza,prossimo),prossimo,i+1));
 		}
@@ -54,8 +58,6 @@ public class Simulator {
 			
 			this.tempoNecessario = tempo;
 			
-			//System.out.println(e.toString());
-			
 			Food prossimo = this.prossimo(corrente, this.giaTrattati); 		// il metodo mette il cibo aggiunto nella lista dei trattati e lo restituisce
 			
 			if (prossimo != null) { 										// ancora cibi disponibili
@@ -66,21 +68,20 @@ public class Simulator {
 	}
 	
 	public Food prossimo(Food f, Map<Integer,Food> trattati) {
-		
-		TreeMap<Double,Food> map = new TreeMap<Double,Food>(Collections.reverseOrder());
+				
 		double tempoCibo = 0.0;
+		Food cibo = null;
 				
 		for (Food f2:Graphs.neighborListOf(grafo, f)) {
-			if(!trattati.containsKey(f2.getFood_code())) {
+			if(!trattati.containsKey(f2.getFood_code()) && this.tempo(f, f2) > tempoCibo) {
 				tempoCibo = this.tempo(f, f2);
-				map.put(tempoCibo, f2);
+				cibo = f2;
 			}
 		}
 
-		if (map.size()>0) {
-			Food daAggiungere = map.get(tempoCibo);
-			this.giaTrattati.put(daAggiungere.getFood_code(), f);
-			return daAggiungere;
+		if (cibo != null) {
+			trattati.put(cibo.getFood_code(), f);
+			return cibo;
 		} else
 			return null;
 	}

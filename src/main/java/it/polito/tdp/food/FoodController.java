@@ -5,10 +5,12 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.food.model.Food;
+import it.polito.tdp.food.model.FoodAndWeight;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -79,15 +81,15 @@ public class FoodController {
     	try {
     		Food cibo = this.boxFood.getValue();
     		
-    		Map<Double,Food> res = model.migliori(cibo);
+    		List<FoodAndWeight> res = model.migliori(cibo);
     		
     		int i=0;
     		
     		this.txtResult.appendText("(massimo) 5 cibi con calorie congiunte massime a partire da " + cibo + "\n");
     		
-    		for (Double d:res.keySet()) {
+    		for (FoodAndWeight f:res) {
     			if (i<5) {
-    				this.txtResult.appendText(res.get(d) + " peso: " + d + "\n");
+    				this.txtResult.appendText(f.getFood() + " peso: " + f.getWeight() + "\n");
     				i++;
     			}
     		}

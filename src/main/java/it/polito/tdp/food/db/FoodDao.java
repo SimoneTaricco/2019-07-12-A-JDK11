@@ -125,8 +125,9 @@ public class FoodDao {
 		String sql = "SELECT f1.food_code AS id1, f2.food_code AS id2, AVG(DISTINCT c1.condiment_calories) AS peso "
 				+ "FROM food_condiment f1, food_condiment f2, condiment c1, condiment c2 "
 				+ "WHERE f1.condiment_code = c1.condiment_code AND f2.condiment_code = c2.condiment_code "
+				+ "AND f1.condiment_code = f2.condiment_code "
 				+ "AND f1.food_code > f2.food_code "
-				+ "GROUP BY f1.food_code, f2.food_code" ;
+				+ "GROUP BY f1.food_code, f2.food_code " ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
 

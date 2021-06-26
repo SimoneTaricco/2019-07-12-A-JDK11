@@ -2,6 +2,7 @@ package it.polito.tdp.food.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class Model {
 	private Map<Integer,Food> idMap; 
 	private FoodDao dao;
 	private Simulator sim;
+	
+	private List<Food> partenza;
 			
 	public Model() {
 		this.dao = new FoodDao();
@@ -56,18 +59,33 @@ public class Model {
 		return this.grafo.edgeSet().size();
 	}
 	
-	public Map<Double,Food> migliori(Food f) {
+	public List<FoodAndWeight> migliori(Food f) {
 		
-		TreeMap<Double,Food> map = new TreeMap<Double,Food>(Collections.reverseOrder());
-				
-		for (Food f2:Graphs.neighborListOf(grafo, f))
-			map.put(grafo.getEdgeWeight(this.grafo.getEdge(f2, f)), f2);
-
+		ArrayList<FoodAndWeight> map = new ArrayList<FoodAndWeight>();
+					
+		for (Food f2:Graphs.neighborListOf(grafo, f)) {
+			map.add(new FoodAndWeight(f2, this.grafo.getEdgeWeight(grafo.getEdge(f, f2))));
+		}
+		
+		Collections.sort(map, new Comparator<FoodAndWeight>() {
+			public int compare(FoodAndWeight o1, FoodAndWeight o2) {
+			if (o2.weight - o1.weight < 0) 
+				return -1;
+			else  			
+				return 1;
+		}
+		}); 
 		return map;
 	}
 	
-	public void simula(int numeroStazioni, Food partenza) {	
-		this.sim = new Simulator(this.grafo, numeroStazioni, partenza, this.migliori(partenza));
+	public void simula(int numeroStazioni, Food partenza) {
+		
+		this.partenza = new ArrayList<>();
+		
+		for (FoodAndWeight f:migliori(partenza))
+			this.partenza.add(f.getFood());		
+		
+		this.sim = new Simulator(this.grafo, numeroStazioni, partenza, this.partenza);
 		sim.init();
 	}
 	
